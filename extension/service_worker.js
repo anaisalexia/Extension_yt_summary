@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type == 'home_page') {
     let id = 'action_' + Indicator.id_page_loaded;
     AllNavigationData[id] = 'on the home page';
-    console.log(stringify(AllNavigationData));
+    console.log(JSON.stringify(AllNavigationData));
   }
 
     // we supposed that if there is a title, a new page(video) has been loaded

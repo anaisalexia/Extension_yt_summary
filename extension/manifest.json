@@ -1,0 +1,47 @@
+
+  {
+    "manifest_version": 3,
+  
+    "name": "Usual Usage on the Web",
+  
+    "description": "This extension is for education purpose",
+  
+    "version": "0.2.0",
+    "action": {
+      "default_icon": {              
+        "16": "yt_logo.png",
+        "32": "yt_logo.png",
+        "48": "yt_logo.png",
+        "128": "yt_logo.png"    
+      },
+      "default_title": "Click Me",   
+      "default_popup": "popup.html"
+    },
+    "permissions": ["scripting","tabs", "downloads", "webNavigation", "storage","offscreen"],
+  
+    "content_scripts": [
+      {
+        "matches": ["*://www.youtube.com/*"],
+        "js": ["content_script.js"],
+        "all_frames": true
+      }
+      ],
+    "background": {"service_worker": "service_worker.js"},
+  
+  
+    "icons": {              
+      "16": "yt_logo.png",
+      "32": "yt_logo.png",
+      "48": "yt_logo.png",
+      "128": "yt_logo.png"    
+    },
+  
+    
+  
+    
+  
+    "host_permissions": ["<all_urls>"]
+  
+  
+  }
+  

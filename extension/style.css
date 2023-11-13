@@ -1,0 +1,21 @@
+#text{
+    border: 0;  
+}
+
+#text_2{
+    border: 0;  
+}
+
+#one_button{
+    border : 0;
+}
+
+#scroll {
+    background-color: #fed9ff;
+    width: 600px;
+    height: 150px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-align: center;
+    padding: 20px;
+  }

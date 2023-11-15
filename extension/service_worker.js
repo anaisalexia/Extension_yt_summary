@@ -11,12 +11,16 @@ var Indicator = {
 }
 
 // characteristic of the loaded page
-var VideoPageData = {
-  video_title:'',
-  video_length: 0,
-};
+
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  
+  let VideoPageData = {
+    video_title:'',
+    video_length: 0,
+  };
+
   
   if (message.type == 'home_page') {
     let id = 'action_' + Indicator.id_page_loaded;
@@ -47,6 +51,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     let id = 'action_' + Indicator.id_page_loaded;
     AllNavigationData[id] = VideoPageData;
   }
+
+  else if (message.type == 'page_loaded'){
+
+  }
+  Indicator.id_page_loaded = Indicator.id_page_loaded + 1;
 
   }
 );

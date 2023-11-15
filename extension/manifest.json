@@ -17,7 +17,7 @@
       "default_title": "Click Me",   
       "default_popup": "popup.html"
     },
-    "permissions": ["scripting","tabs", "downloads", "webNavigation", "storage","offscreen"],
+    "permissions": ["scripting","activeTab","tabs", "downloads", "webNavigation", "storage","offscreen"],
   
     "content_scripts": [
       {

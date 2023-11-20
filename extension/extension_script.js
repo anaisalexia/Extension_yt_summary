@@ -1,22 +1,43 @@
 var button_save = document.getElementById('one_button');
+var button_display = document.getElementById('display');
+
 var text = document.getElementById('text');
 
-const setPopupInfo = info => {
-    document.getElementById('text_2').textContent = info.description;
+const savePopUpInfo = info => {
+    document.getElementById('text_2').textContent = 'Data saved !'
     document.getElementById('scroll').innerHTML = info.data;
+
+    function download(content, fileName, contentType) {
+        var a = document.createElement("a");
+        var file = new Blob([content], {type: contentType});
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+    }
+    download(info.data, 'navigation_data.txt', 'text/plain');
   };
 
+const displayPopUpInfo = info => {
+  document.getElementById('text_2').textContent = 'Data displayed !'
+  document.getElementById('scroll').innerHTML = info.data;
+};
 
 function oc_function_save() {
-    // send message to service worker
-    text.textContent = 'button clicked for saving !';
-
     //send message to background script to get all the navigation data back
-    chrome.runtime.sendMessage({type: "display_all_navigation_data"},setPopupInfo); 
+    chrome.runtime.sendMessage({type: "display_all_navigation_data"},savePopUpInfo); 
+
+}
+
+function oc_function_display() {
+  //send message to background script to get all the navigation data back
+  chrome.runtime.sendMessage({type: "display_all_navigation_data"},displayPopUpInfo); 
 
 }
 
 button_save.addEventListener("click", oc_function_save);
+button_display.addEventListener("click", oc_function_display);
+
+
 
 
 //How to send message to content script

@@ -17,10 +17,13 @@ async function getTabId() {
 var VideoPageData = {
   page_title: '',
   video_title:'',
-  video_length: 0,
-  vision_time: 0,
+  video_length: '',
+  vision_time: '',
   url:'',
-  elapsed_time: 0
+  elapsed_time: '',
+  video_description:'',
+  video_tag:'',
+  watch_date:''
 };
 
 var current_url = window.location.toString();
@@ -28,14 +31,26 @@ var current_page = 'None';
 var startDate = new Date();
 var endDate = new Date();
 
+async function get_description(){
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve( document.querySelector("#description-inline-expander > yt-attributed-string"));
+    });
+  });
+}
 
-function execute_contentscript(VideoPageData){
-  VideoPageData.page_title= '';
-  VideoPageData.video_title='';
-  VideoPageData.video_length= 0;
-  VideoPageData.vision_time= 0;
-  VideoPageData.url='';
-  VideoPageData.elapsed_time= 0;
+async function execute_contentscript(){
+
+  for (let i = 0; i< Object.keys(VideoPageData).length; i++){
+    VideoPageData[Object.keys(VideoPageData)[i]] = '';
+  }
+
+  // VideoPageData.page_title= '';
+  // VideoPageData.video_title='';
+  // VideoPageData.video_length= 0;
+  // VideoPageData.vision_time= 0;
+  // VideoPageData.url='';
+  // VideoPageData.elapsed_time= 0;
 
   console.log('Content script loaded on YouTube page.');
   document.addEventListener("mousedown", mouse_clicked);
@@ -59,14 +74,27 @@ function execute_contentscript(VideoPageData){
 
     let videoTitleElement = document.querySelector("h1.ytd-watch-metadata yt-formatted-string");
     let videoLength = document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration");
+    let videoExpand = document.querySelector("#expand");
+    
+    videoExpand.click();
+    var videoDescription = await get_description() ;
 
+    
+
+
+    console.log('video desc',videoDescription.textContent);
+    
+    let videoTag = document.querySelector("#info > a");
+
+    
+
+    
     // [...document.querySelectorAll('yt-formatted-string.ytd-rich-grid-media')].map(x => x.innerText)
     // https://copyprogramming.com/howto/javascript-javascript-retrieve-a-youtube-video-title
 
     VideoPageData.url = current_url;
 
     if (videoLength != null){
-      current_page = 'video';
       console.log('Video Length:', videoLength.textContent);
       VideoPageData.video_length = videoLength.textContent;
 
@@ -74,15 +102,24 @@ function execute_contentscript(VideoPageData){
 
       // if the new video has an add (ie video length shorter than 1 min)
       if (parseInt(time_array[0]) < 1){
-        setTimeout(execute_contentscript, (parseInt(time_array[1])+1)*1000, VideoPageData );
+        setTimeout(execute_contentscript, (parseInt(time_array[1])+1)*1000 );
       }
     }
 
     if (videoTitleElement != null) {
-      current_page = 'video';
       console.log('Video Title:', videoTitleElement.textContent);
       VideoPageData.video_title = videoTitleElement.textContent;
       
+    }
+
+    if (videoDescription != null){
+      console.log('Video Title:', videoDescription.textContent);
+      VideoPageData.video_description = videoDescription.textContent;
+    }
+
+    if (videoTag != null){
+      console.log('Video Title:', videoTag.textContent);
+      VideoPageData.video_tag = videoTag.textContent;
     }
   }
   else{
@@ -109,20 +146,9 @@ function get_new_url(){
    });
 }
 
-function init_VideoPageData(){
-  setTimeout(()=>{
-  VideoPageData = {
-    page_title: '',
-    video_title:'',
-    video_length: 0,
-    vision_time: 0,
-    url:'',
-    elapsed_time: 0
-  };},0);
-}
 
 
-setTimeout(execute_contentscript, 2000,VideoPageData);
+setTimeout(execute_contentscript, 2000);
 
 async function mouse_clicked(MouseEvent){
   console.log('clicked')
@@ -173,7 +199,7 @@ async function mouse_clicked(MouseEvent){
 
     
 
-    setTimeout(execute_contentscript, 100,VideoPageData);
+    setTimeout(execute_contentscript, 100);
 
 
   }

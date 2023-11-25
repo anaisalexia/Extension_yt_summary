@@ -19,7 +19,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     video_length: 0,
     video_vision_time: 0,
     url : '',
-    elapsed_time:0
+    elapsed_time:0,
+    video_tag:'',
+    video_description:''
   };
 
   
@@ -37,6 +39,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     VideoPageData.url = message.data.url;
     VideoPageData.elapsed_time = message.data.elapsed_time;
     VideoPageData.page_title = message.data.page_title;
+    VideoPageData.video_tag = message.data.video_tag;
+    VideoPageData.video_description = message.data.video_description;
+
 
     let id = 'action_' + Indicator.id_page_loaded;
     AllNavigationData[id] = VideoPageData;

@@ -4,14 +4,46 @@
 //   console.log('page changed');
 // }); // not working
 
+
+// // TO communicate with the port initiated in background script
+// chrome.runtime.onConnect.addListener(port => {
+//   port.onMessage.addListener(msg => {
+//     console.log(msg.data);
+//     // send a response if needed, may be a simple object/array
+//     port.postMessage({id: msg.id, data: 'gotcha'}); 
+//   });
+// // });
+
+
+// var port = chrome.runtime.connect({name: "knockknock"});
+// port.postMessage({joke: "Knock knock"});
+// port.onMessage.addListener(function(msg) {
+//   if (msg.question === "Who's there?")
+//     port.postMessage({answer: "Madame"});
+//   else if (msg.question === "Madame who?")
+//     port.postMessage({answer: "Madame... Bovary"});
+// });
+
+
+
+// chrome.runtime.onConnect.addListener(function(port) {
+//   console.assert(port.name === "knockknock");
+//   port.onMessage.addListener(function(msg) {
+//     if (msg.joke === "Knock knock")
+//       port.postMessage({question: "Who's there?"});
+//     else if (msg.answer === "Madame")
+//       port.postMessage({question: "Madame who?"});
+//     else if (msg.answer === "Madame... Bovary")
+//       port.postMessage({question: "I don't get it."});
+//   });
+// });
+
 async function getTabId() { 
   let queryOptions = { active: true, lastFocusedWindow: true };
   // `tab` will either be a `tabs.Tab` instance or `undefined`.
   let [tab] = await chrome.runtime.tabs.query(queryOptions);
   return tab.id;
  }
-
-
 
 
 var VideoPageData = {
@@ -23,7 +55,8 @@ var VideoPageData = {
   elapsed_time: '',
   video_description:'',
   video_tag:'',
-  watch_date:''
+  watch_date:'',
+  channel:'',
 };
 
 var current_url = window.location.toString();
@@ -45,12 +78,7 @@ async function execute_contentscript(){
     VideoPageData[Object.keys(VideoPageData)[i]] = '';
   }
 
-  // VideoPageData.page_title= '';
-  // VideoPageData.video_title='';
-  // VideoPageData.video_length= 0;
-  // VideoPageData.vision_time= 0;
-  // VideoPageData.url='';
-  // VideoPageData.elapsed_time= 0;
+  
 
   console.log('Content script loaded on YouTube page.');
   document.addEventListener("mousedown", mouse_clicked);
@@ -75,6 +103,7 @@ async function execute_contentscript(){
     let videoTitleElement = document.querySelector("h1.ytd-watch-metadata yt-formatted-string");
     let videoLength = document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration");
     let videoExpand = document.querySelector("#expand");
+    let videoChannel = document.querySelector("#text > a");
     
     videoExpand.click();
     var videoDescription = await get_description() ;
@@ -121,6 +150,13 @@ async function execute_contentscript(){
       console.log('Video Title:', videoTag.textContent);
       VideoPageData.video_tag = videoTag.textContent;
     }
+
+    if (videoChannel != null){
+      console.log('Channel : ', videoChannel);
+      VideoPageData.channel = videoChannel.textContent;
+    }
+
+    VideoPageData.watch_date = startDate;
   }
   else{
     // on an other page
@@ -145,7 +181,6 @@ function get_new_url(){
     setTimeout(()=>{  resolve(window.location.toString()); },2000);
    });
 }
-
 
 
 setTimeout(execute_contentscript, 2000);

@@ -3,6 +3,20 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('Extension installed.');
 });
 
+// chrome.runtime.onConnect.addListener(function(port) {
+//   console.assert(port.name === "knockknock");
+//   port.onMessage.addListener(function(msg) {
+//     if (msg.joke === "Knock knock")
+//       port.postMessage({question: "Who's there?"});
+//     else if (msg.answer === "Madame")
+//       port.postMessage({question: "Madame who?"});
+//     else if (msg.answer === "Madame... Bovary")
+//       port.postMessage({question: "I don't get it."});
+//   });
+// });
+
+
+
 // SAVES ALL THE INFORMATION ABOUT THE NAVIGATION STEP OF THE USER
 var AllNavigationData = {'action_ini':'pageloaded'}
 
@@ -13,19 +27,12 @@ var Indicator = {
 // characteristic of the loaded page
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
-  let VideoPageData = {
-    page_title:'',
-    video_title:'',
-    video_length: 0,
-    video_vision_time: 0,
-    url : '',
-    elapsed_time:0,
-    video_tag:'',
-    video_description:''
-  };
+  let VideoPageData;
 
   
   if (message.type == 'on_home_page') {
+    VideoPageData = message.data
+
     let id = 'action_' + Indicator.id_page_loaded;
     AllNavigationData[id] = 'on the home page';
   }
@@ -33,15 +40,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // we supposed that if there is a title, a new page(video) has been loaded
 
   else if (message.type == 'video_page_data'){
-    VideoPageData.video_length = message.data.video_length;
-    VideoPageData.video_title = message.data.video_title;
-    VideoPageData.video_vision_time = message.data.vision_time;
-    VideoPageData.url = message.data.url;
-    VideoPageData.elapsed_time = message.data.elapsed_time;
-    VideoPageData.page_title = message.data.page_title;
-    VideoPageData.video_tag = message.data.video_tag;
-    VideoPageData.video_description = message.data.video_description;
-
+    VideoPageData = message.data
 
     let id = 'action_' + Indicator.id_page_loaded;
     AllNavigationData[id] = VideoPageData;
@@ -72,4 +71,52 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
     response(response_data);
   }
 });
+
+
+
+// window.addEventListener('unload', function(event) {
+//   // localStorage.setItem("Saved", "yes");
+//   console.log('SAved');
+// });
+// console.log("Saved:", localStorage.getItem('Saved'));
+
+
+// //  Initialisation porte
+// const portMap = new Map();
+// const resolveMap = new Map();
+// let messageId = 0;
+
+// chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+//   if (changeInfo.status === 'complete') {
+//     const response = await send(tabId, {message: 'dataready', action: 'foo'});
+//     console.log(response);
+//   }
+// });
+
+// function onPortDisconnected(port) {
+//   portMap.delete(port.sender.tab.id);
+// }
+
+// function onPortMessage(msg, port) {
+//   resolveMap.get(msg.id)(msg.data);
+//   resolveMap.delete(msg.id);
+// }
+
+// function send(tabId, data) {
+//   return new Promise(resolve => {
+//     const id = ++messageId;
+//     let port = portMap.get(tabId);
+//     if (!port) {
+//       port = chrome.tabs.connect(tabId, {frameId: 0});
+//       port.onDisconnect.addListener(onPortDisconnected);
+//       port.onMessage.addListener(onPortMessage);
+//       portMap.set(tabId, port);
+//     }
+//     resolveMap.set(id, resolve);
+//     port.postMessage({id, data});
+//   });
+// }
+
+
+
 

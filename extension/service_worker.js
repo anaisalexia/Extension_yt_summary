@@ -18,59 +18,66 @@ chrome.runtime.onInstalled.addListener(() => {
 
 
 // SAVES ALL THE INFORMATION ABOUT THE NAVIGATION STEP OF THE USER
-var AllNavigationData = {'action_ini':'pageloaded'}
+// var AllNavigationData = {'action_ini':'pageloaded'}
 
-var Indicator = {
-  id_page_loaded: 0,
-}
+chrome.storage.session.set({ action_ini: 'script loaded' })
+
+
 
 // characteristic of the loaded page
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
-  let VideoPageData;
-
-  
   if (message.type == 'on_home_page') {
-    VideoPageData = message.data
 
-    let id = 'action_' + Indicator.id_page_loaded;
-    AllNavigationData[id] = 'on the home page';
+    let id = new Date();
+    chrome.storage.session.set({ [id]: message.data })
+
   }
 
     // we supposed that if there is a title, a new page(video) has been loaded
 
   else if (message.type == 'video_page_data'){
-    VideoPageData = message.data
 
-    let id = 'action_' + Indicator.id_page_loaded;
-    AllNavigationData[id] = VideoPageData;
+    let id = new Date();
+    chrome.storage.session.set({ [id]: message.data }).then(() => {
+      console.log("Value is set",id);
+    });
+    
   }
-
-  Indicator.id_page_loaded = Indicator.id_page_loaded + 1;
-
   }
 );
 
+var AllNavigationData_storage = {};
 
-
-chrome.runtime.onMessage.addListener((msg, sender, response) => {
+chrome.runtime.onMessage.addListener(async (msg, sender, response) => {
   // First, validate the message's structure.
   
   if (msg.type == 'display_all_navigation_data') {
     // Collect the necessary data. 
     console.log(msg.type)
-    var response_data = {
-      description: "All the data saved during the navigation",
-      data: JSON.stringify(AllNavigationData),
     
+   
+    AllNavigationData_storage = await  chrome.storage.session.get(null);
+    AllNavigationData_storage.then(send_msg());
+    
+      
+    
+
     }
-    
+    // response(JSON.stringify(response_data));
 
     // Directly respond to the sender (popup), 
     // through the specified callback.
-    response(response_data);
   }
-});
+);
+
+function send_msg(){
+  chrome.runtime.sendMessage(
+    {msg: 'saved_data',
+    description: "All the data saved during the navigation",
+     data : JSON.stringify(AllNavigationData_storage) }
+    )
+ }
 
 
 

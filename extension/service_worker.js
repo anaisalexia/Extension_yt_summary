@@ -58,7 +58,19 @@ chrome.runtime.onMessage.addListener(async (msg, sender, response) => {
     
    
     AllNavigationData_storage = await  chrome.storage.session.get(null);
-    AllNavigationData_storage.then(send_msg());
+    AllNavigationData_storage.then(send_msg_disp());
+    
+      
+    
+
+    }
+    
+  else if (msg.type == 'save_all_navigation_data') {
+    // Collect the necessary data. 
+    console.log(msg.type)
+
+    AllNavigationData_storage = await  chrome.storage.session.get(null);
+    AllNavigationData_storage.then(send_msg_save());
     
       
     
@@ -71,14 +83,20 @@ chrome.runtime.onMessage.addListener(async (msg, sender, response) => {
   }
 );
 
-function send_msg(){
+function send_msg_disp(){
   chrome.runtime.sendMessage(
-    {msg: 'saved_data',
+    {msg: 'for display',
     description: "All the data saved during the navigation",
      data : JSON.stringify(AllNavigationData_storage) }
     )
  }
-
+ function send_msg_save(){
+  chrome.runtime.sendMessage(
+    {msg: 'for saving',
+    description: "All the data saved during the navigation",
+     data : JSON.stringify(AllNavigationData_storage) }
+    )
+ }
 
 
 // window.addEventListener('unload', function(event) {

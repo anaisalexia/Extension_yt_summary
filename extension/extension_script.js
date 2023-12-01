@@ -6,39 +6,39 @@ var button_display = document.getElementById('display');
 
 var text = document.getElementById('text');
 
-const savePopUpInfo = async info => {
-    document.getElementById('text_2').textContent = 'Data saved !'
-    document.getElementById('scroll').innerHTML = await info.data;
 
-    async function download(content, fileName, contentType) {
-        var a = document.createElement("a");
-        var file = new Blob([content], {type: contentType});
-        a.href = URL.createObjectURL(file);
-        a.download = fileName;
-        a.click();
-    }
-    download(await info.data, 'navigation_data.txt', 'text/plain');
-  };
 
 
 
 async function oc_function_save() {
     //send message to background script to get all the navigation data back
-    chrome.runtime.sendMessage({type: "display_all_navigation_data"}); 
-
+    var resp = await chrome.runtime.sendMessage({type: "save_all_navigation_data"}); 
+  
 }
-
 
 async function oc_function_display() {
   //send message to background script to get all the navigation data back
-  var resp = await chrome.runtime.sendMessage({type: "display_all_navigation_data"},displayPopUpInfo); 
-  resp.then(displayPopUpInfo(displayPopUpInfo));
-  
+  var resp = await chrome.runtime.sendMessage({type: "display_all_navigation_data"}); 
 }
+
 function displayPopUpInfo (info) {
   console.log('data',info);
   document.getElementById('text_2').textContent = 'Data displayed !';
   document.getElementById('scroll').innerHTML = info.data;
+};
+
+function savePopUpInfo (info ) {
+  document.getElementById('text_2').textContent = 'Data saved !'
+  document.getElementById('scroll').innerHTML =  info.data;
+
+  async function download(content, fileName, contentType) {
+      var a = document.createElement("a");
+      var file = new Blob([content], {type: contentType});
+      a.href = URL.createObjectURL(file);
+      a.download = fileName;
+      a.click();
+  }
+  download(info.data, 'navigation_data.txt', 'text/plain');
 };
 
 button_save.addEventListener("click", oc_function_save);
@@ -47,10 +47,14 @@ button_display.addEventListener("click", oc_function_display);
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-      if (request.msg === "saved_data") {
+      if (request.msg === "for display") {
           console.log(request.data);
           displayPopUpInfo(request);
       }
+      else if (request.msg === "for saving") {
+        console.log(request.data);
+        savePopUpInfo(request);
+    }
   }
 );
 

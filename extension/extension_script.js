@@ -22,14 +22,73 @@ async function oc_function_display() {
 }
 
 function displayPopUpInfo (info) {
-  console.log('data',info);
-  document.getElementById('text_2').textContent = 'Data displayed !';
-  document.getElementById('scroll').innerHTML = info.data;
+  console.log('DATA DISPLAYED: ',info);
+
+  // document.getElementById('text_2').textContent = 'Data displayed !';
+  var json_data = JSON.parse(info.data);
+  var data_keys = Object.keys(json_data);
+  var text = '<ol>';
+  for (var key of data_keys){
+    if (json_data[key]['page_title']  == 'video'){
+    
+      text = text + '<li> <b> "' + json_data[key]['video_title'] + '" </b>'
+      + '<ul>' 
+      + '<li> Channel: ' + json_data[key]['channel'] + '</li>'
+      + '<li> Length: ' + json_data[key]['video_length'] + '</li>'
+      + '<li> Watch time: ' + json_data[key]['vision_time'] + '</li>'
+      + '</ul>'
+      + '</li>';
+    }
+    else{
+      let time = json_data[key]['elapsed_time']/1000;
+      let time_min = Math.floor(time/60);
+      let time_sec = Math.floor(time%60);
+
+      text = text + '<li> ' + json_data[key]['page_title'] 
+      + '<ul>' 
+      + '<li> Time spent: ' + time_min+':'+time_sec + '</li>'
+      + '</ul>'
+      + '</li>';
+    }
+  }
+  text = text + '</ol>';
+  document.getElementById('style-2').innerHTML = text;
+
 };
 
 function savePopUpInfo (info ) {
-  document.getElementById('text_2').textContent = 'Data saved !'
-  document.getElementById('scroll').innerHTML =  info.data;
+  console.log('DATA SAVED: ',info);
+
+  // document.getElementById('text_2').textContent = 'Data displayed !';
+  var json_data = JSON.parse(info.data);
+  var data_keys = Object.keys(json_data);
+  var text = '<ol>';
+  for (var key of data_keys){
+    if (json_data[key]['page_title']  == 'video'){
+    
+      text = text + '<li> <b> "' + json_data[key]['video_title'] + '" </b>'
+      + '<ul>' 
+      + '<li> Channel: ' + json_data[key]['channel'] + '</li>'
+      + '<li> Length: ' + json_data[key]['video_length'] + '</li>'
+      + '<li> Watch time: ' + json_data[key]['vision_time'] + '</li>'
+      + '</ul>'
+      + '</li>';
+    }
+    else{
+      let time = json_data[key]['elapsed_time']/1000;
+      let time_min = Math.floor(time/60);
+      let time_sec = Math.floor(time%60);
+
+      text = text + '<li> ' + json_data[key]['page_title'] 
+      + '<ul>' 
+      + '<li> Time spent: ' + time_min+':'+time_sec + '</li>'
+      + '</ul>'
+      + '</li>';
+    }
+  }
+  text = text + '</ol>';
+  document.getElementById('style-2').innerHTML = text;
+
 
   async function download(content, fileName, contentType) {
       var a = document.createElement("a");

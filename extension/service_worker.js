@@ -20,7 +20,7 @@ chrome.runtime.onInstalled.addListener(() => {
 // SAVES ALL THE INFORMATION ABOUT THE NAVIGATION STEP OF THE USER
 // var AllNavigationData = {'action_ini':'pageloaded'}
 
-chrome.storage.session.set({ action_ini: 'script loaded' })
+// chrome.storage.session.set({ action_ini: {page_title : 'script loaded' } })
 
 
 
@@ -29,7 +29,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
   if (message.type == 'on_home_page') {
 
-    let id = new Date();
+    let id = Date.now();
     chrome.storage.session.set({ [id]: message.data })
 
   }
@@ -38,7 +38,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   else if (message.type == 'video_page_data'){
 
-    let id = new Date();
+    let id = Date.now();
     chrome.storage.session.set({ [id]: message.data }).then(() => {
       console.log("Value is set",id);
     });

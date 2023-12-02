@@ -74,7 +74,7 @@ async function get_description(){
 
 async function execute_contentscript(){
 
-  for (let i = 0; i< Object.keys(VideoPageData).length; i++){
+  for (let i = 0; i<= Object.keys(VideoPageData).length; i++){
     VideoPageData[Object.keys(VideoPageData)[i]] = '';
   }
 
@@ -103,7 +103,7 @@ async function execute_contentscript(){
     let videoTitleElement = document.querySelector("h1.ytd-watch-metadata yt-formatted-string");
     let videoLength = document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration");
     let videoExpand = document.querySelector("#expand");
-    let videoChannel = document.querySelector("#text > a");
+    let videoChannel = document.querySelector("#upload-info > #channel-name > #container > #text-container > #text > a"); //# pb #text > a est aussi présent dans des balises qui semblent tracer un historique =, ainsi la channel récupérer n'est pas la bonne  
     
     videoExpand.click();
     var videoDescription = await get_description() ;

@@ -26,7 +26,9 @@
         "all_frames": true
       }
       ],
-    "background": {"service_worker": "service_worker.js"},
+    "background": {
+      "service_worker": "service_worker.js"
+      },
   
   
     "icons": {              

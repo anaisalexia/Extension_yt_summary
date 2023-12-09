@@ -3,49 +3,22 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('Extension installed.');
 });
 
-// chrome.runtime.onConnect.addListener(function(port) {
-//   console.assert(port.name === "knockknock");
-//   port.onMessage.addListener(function(msg) {
-//     if (msg.joke === "Knock knock")
-//       port.postMessage({question: "Who's there?"});
-//     else if (msg.answer === "Madame")
-//       port.postMessage({question: "Madame who?"});
-//     else if (msg.answer === "Madame... Bovary")
-//       port.postMessage({question: "I don't get it."});
-//   });
-// });
-
-
-
-// SAVES ALL THE INFORMATION ABOUT THE NAVIGATION STEP OF THE USER
-// var AllNavigationData = {'action_ini':'pageloaded'}
-
-// chrome.storage.session.set({ action_ini: {page_title : 'script loaded' } })
-
-
-
 // characteristic of the loaded page
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
   if (message.type == 'on_home_page') {
-
     let id = Date.now();
     chrome.storage.session.set({ [id]: message.data })
-
   }
 
-    // we supposed that if there is a title, a new page(video) has been loaded
-
   else if (message.type == 'video_page_data'){
-
     let id = Date.now();
     chrome.storage.session.set({ [id]: message.data }).then(() => {
       console.log("Value is set",id);
     });
     
   }
-  }
-);
+});
 
 var AllNavigationData_storage = {};
 
@@ -53,33 +26,19 @@ chrome.runtime.onMessage.addListener(async (msg, sender, response) => {
   // First, validate the message's structure.
   
   if (msg.type == 'display_all_navigation_data') {
-    // Collect the necessary data. 
+
     console.log(msg.type)
-    
-   
     AllNavigationData_storage = await  chrome.storage.session.get(null);
     AllNavigationData_storage.then(send_msg_disp());
-    
-      
-    
-
     }
     
   else if (msg.type == 'save_all_navigation_data') {
-    // Collect the necessary data. 
     console.log(msg.type)
-
     AllNavigationData_storage = await  chrome.storage.session.get(null);
     AllNavigationData_storage.then(send_msg_save());
     
-      
-    
-
     }
     // response(JSON.stringify(response_data));
-
-    // Directly respond to the sender (popup), 
-    // through the specified callback.
   }
 );
 
@@ -90,6 +49,7 @@ function send_msg_disp(){
      data : JSON.stringify(AllNavigationData_storage) }
     )
  }
+
  function send_msg_save(){
   chrome.runtime.sendMessage(
     {msg: 'for saving',
@@ -141,6 +101,27 @@ function send_msg_disp(){
 //     port.postMessage({id, data});
 //   });
 // }
+
+
+
+// chrome.runtime.onConnect.addListener(function(port) {
+//   console.assert(port.name === "knockknock");
+//   port.onMessage.addListener(function(msg) {
+//     if (msg.joke === "Knock knock")
+//       port.postMessage({question: "Who's there?"});
+//     else if (msg.answer === "Madame")
+//       port.postMessage({question: "Madame who?"});
+//     else if (msg.answer === "Madame... Bovary")
+//       port.postMessage({question: "I don't get it."});
+//   });
+// });
+
+
+
+// SAVES ALL THE INFORMATION ABOUT THE NAVIGATION STEP OF THE USER
+// var AllNavigationData = {'action_ini':'pageloaded'}
+
+// chrome.storage.session.set({ action_ini: {page_title : 'script loaded' } })
 
 
 

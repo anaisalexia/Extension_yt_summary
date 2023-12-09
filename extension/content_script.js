@@ -5,38 +5,7 @@
 // }); // not working
 
 
-// // TO communicate with the port initiated in background script
-// chrome.runtime.onConnect.addListener(port => {
-//   port.onMessage.addListener(msg => {
-//     console.log(msg.data);
-//     // send a response if needed, may be a simple object/array
-//     port.postMessage({id: msg.id, data: 'gotcha'}); 
-//   });
-// // });
 
-
-// var port = chrome.runtime.connect({name: "knockknock"});
-// port.postMessage({joke: "Knock knock"});
-// port.onMessage.addListener(function(msg) {
-//   if (msg.question === "Who's there?")
-//     port.postMessage({answer: "Madame"});
-//   else if (msg.question === "Madame who?")
-//     port.postMessage({answer: "Madame... Bovary"});
-// });
-
-
-
-// chrome.runtime.onConnect.addListener(function(port) {
-//   console.assert(port.name === "knockknock");
-//   port.onMessage.addListener(function(msg) {
-//     if (msg.joke === "Knock knock")
-//       port.postMessage({question: "Who's there?"});
-//     else if (msg.answer === "Madame")
-//       port.postMessage({question: "Madame who?"});
-//     else if (msg.answer === "Madame... Bovary")
-//       port.postMessage({question: "I don't get it."});
-//   });
-// });
 
 async function getTabId() { 
   let queryOptions = { active: true, lastFocusedWindow: true };
@@ -57,7 +26,9 @@ var VideoPageData = {
   video_tag:'',
   watch_date:'',
   channel:'',
+  recommendation: {}
 };
+
 
 var current_url = window.location.toString();
 var current_page = 'None';
@@ -66,9 +37,9 @@ var endDate = new Date();
 
 async function get_description(){
   return new Promise((resolve) => {
-    setTimeout(() => {
+    
       resolve( document.querySelector("#description-inline-expander > yt-attributed-string"));
-    });
+    
   });
 }
 
@@ -77,13 +48,11 @@ async function execute_contentscript(){
   for (let i = 0; i<= Object.keys(VideoPageData).length; i++){
     VideoPageData[Object.keys(VideoPageData)[i]] = '';
   }
-
-  
+  VideoPageData['recommendation'] = {};
 
   console.log('Content script loaded on YouTube page.');
   document.addEventListener("mousedown", mouse_clicked);
-
-
+  
   let title = document.querySelector("head > title");
 
   // add time spend on home page
@@ -104,15 +73,13 @@ async function execute_contentscript(){
     let videoLength = document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration");
     let videoExpand = document.querySelector("#expand");
     let videoChannel = document.querySelector("#upload-info > #channel-name > #container > #text-container > #text > a"); //# pb #text > a est aussi présent dans des balises qui semblent tracer un historique =, ainsi la channel récupérer n'est pas la bonne  
-    
+    let videoRecommendationList = document.querySelectorAll("#video-title");
+    let videoRecommendationChannel = document.querySelectorAll("#byline-container >  #channel-name > #container > #text-container > #text");
+
     videoExpand.click();
     var videoDescription = await get_description() ;
 
-    
-
-
-    console.log('video desc',videoDescription.textContent);
-    
+      
     let videoTag = document.querySelector("#info > a");
 
     
@@ -142,18 +109,42 @@ async function execute_contentscript(){
     }
 
     if (videoDescription != null){
-      console.log('Video Title:', videoDescription.textContent);
+      // console.log('Video Title:', videoDescription.textContent);
       VideoPageData.video_description = videoDescription.textContent;
     }
 
     if (videoTag != null){
-      console.log('Video Title:', videoTag.textContent);
+      console.log('Video Tags:', videoTag.textContent);
       VideoPageData.video_tag = videoTag.textContent;
     }
 
     if (videoChannel != null){
-      console.log('Channel : ', videoChannel);
+      console.log('Channel : ', videoChannel.textContent);
       VideoPageData.channel = videoChannel.textContent;
+    }
+
+    if (videoRecommendationList != null){
+
+      console.log('Recommendations: ', videoRecommendationList);
+      var item;
+      var item_ch;
+      for (let i = 0; i < 10; i++) {
+        item = videoRecommendationList[i];
+        item_ch = videoRecommendationChannel[i];
+        VideoPageData.recommendation[i] = {'title':videoRecommendationList[i].textContent,
+                                          'channel':videoRecommendationChannel[i].textContent,
+                                          'url':videoRecommendationList[i].parentElement.parentElement.href};
+        // VideoPageData.recommendation[i]['title'] = videoRecommendationList[i].textContent;
+        // VideoPageData.recommendation[i]['channel'] = videoRecommendationChannel[i].textContent;
+        // VideoPageData.recommendation[i]['url'] = videoRecommendationList[i].parentElement.parentElement.href;
+
+        // console.log(item.parentElement.parentElement.href);
+        console.log({'title':item.textContent,
+        'channel':item_ch.textContent,
+        'url':item.parentElement.parentElement.href});
+        console.log(VideoPageData.recommendation); // A FINIR AFFICHER LE RESULTAT
+
+      }
     }
 
     VideoPageData.watch_date = startDate;
@@ -163,12 +154,10 @@ async function execute_contentscript(){
     current_page = 'other';
     VideoPageData.page_title = 'other';
     VideoPageData.url = current_url;
-    console.log('Home page')
+    console.log('other')
   }
   
 }
-
-
 
 function get_vision_time(VideoPageData){
   let videoVisionTime = document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-current");
@@ -184,6 +173,7 @@ function get_new_url(){
 
 
 setTimeout(execute_contentscript, 2000);
+
 
 async function mouse_clicked(MouseEvent){
   console.log('clicked')
@@ -214,7 +204,7 @@ async function mouse_clicked(MouseEvent){
   
 
   let new_url = await get_new_url();
-  console.log(new_url,new_url != current_url);
+  // console.log(new_url,new_url != current_url);
 
   if (new_url != current_url){
     endDate = new Date();
@@ -238,7 +228,6 @@ async function mouse_clicked(MouseEvent){
 
 
   }
-
 }
 
 
@@ -280,3 +269,38 @@ async function mouse_clicked(MouseEvent){
   //     response(domInfo);
   //   }
   // });
+
+
+  
+// // TO communicate with the port initiated in background script
+// chrome.runtime.onConnect.addListener(port => {
+//   port.onMessage.addListener(msg => {
+//     console.log(msg.data);
+//     // send a response if needed, may be a simple object/array
+//     port.postMessage({id: msg.id, data: 'gotcha'}); 
+//   });
+// // });
+
+
+// var port = chrome.runtime.connect({name: "knockknock"});
+// port.postMessage({joke: "Knock knock"});
+// port.onMessage.addListener(function(msg) {
+//   if (msg.question === "Who's there?")
+//     port.postMessage({answer: "Madame"});
+//   else if (msg.question === "Madame who?")
+//     port.postMessage({answer: "Madame... Bovary"});
+// });
+
+
+
+// chrome.runtime.onConnect.addListener(function(port) {
+//   console.assert(port.name === "knockknock");
+//   port.onMessage.addListener(function(msg) {
+//     if (msg.joke === "Knock knock")
+//       port.postMessage({question: "Who's there?"});
+//     else if (msg.answer === "Madame")
+//       port.postMessage({question: "Madame who?"});
+//     else if (msg.answer === "Madame... Bovary")
+//       port.postMessage({question: "I don't get it."});
+//   });
+// });

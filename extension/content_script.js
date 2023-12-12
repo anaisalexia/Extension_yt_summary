@@ -131,18 +131,18 @@ async function execute_contentscript(){
       for (let i = 0; i < 10; i++) {
         item = videoRecommendationList[i];
         item_ch = videoRecommendationChannel[i];
-        VideoPageData.recommendation[i] = {'title':videoRecommendationList[i].textContent,
-                                          'channel':videoRecommendationChannel[i].textContent,
-                                          'url':videoRecommendationList[i].parentElement.parentElement.href};
+        VideoPageData.recommendation[i] = {'title':item.textContent,
+                                          'channel':item_ch.textContent,
+                                          'url':item.parentElement.parentElement.href};
         // VideoPageData.recommendation[i]['title'] = videoRecommendationList[i].textContent;
         // VideoPageData.recommendation[i]['channel'] = videoRecommendationChannel[i].textContent;
         // VideoPageData.recommendation[i]['url'] = videoRecommendationList[i].parentElement.parentElement.href;
 
         // console.log(item.parentElement.parentElement.href);
-        console.log({'title':item.textContent,
-        'channel':item_ch.textContent,
-        'url':item.parentElement.parentElement.href});
-        console.log(VideoPageData.recommendation); // A FINIR AFFICHER LE RESULTAT
+        // console.log({'title':item.textContent,
+        // 'channel':item_ch.textContent,
+        // 'url':item.parentElement.parentElement.href});
+      console.log(VideoPageData.recommendation); // A FINIR AFFICHER LE RESULTAT
 
       }
     }
